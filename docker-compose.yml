@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: animal-pictures-app
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./images:/app/images
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:////app/data/test.db
+    restart: unless-stopped
