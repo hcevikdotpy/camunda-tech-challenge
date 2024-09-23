@@ -2,10 +2,9 @@ from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import sessionmaker
 import os
 import uuid
-from app.db import engine
+from app import db
 from app.models import SavePicturesRequest, Picture, Base
 from app.utils import (
     get_random_cat_image,
@@ -27,11 +26,6 @@ app = FastAPI()
 app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-SessionLocal = sessionmaker(bind=engine)
-
-# create the database tables
-Base.metadata.create_all(bind=engine)
-
 
 @app.post("/save_pictures")
 def save_pictures(request: SavePicturesRequest):
@@ -41,7 +35,7 @@ def save_pictures(request: SavePicturesRequest):
     if animal_type not in ["cat", "dog", "bear"]:
         raise HTTPException(status_code=400, detail="Invalid animal type")
 
-    session = SessionLocal()
+    session = db.SessionLocal()
 
     for _ in range(number):
         try:
@@ -77,7 +71,7 @@ def get_last_picture(animal_type: str):
     if animal_type not in ["cat", "dog", "bear"]:
         raise HTTPException(status_code=400, detail="Invalid animal type")
 
-    session = SessionLocal()
+    session = db.SessionLocal()
     picture = (
         session.query(Picture)
         .filter(Picture.animal_type == animal_type)
@@ -110,7 +104,7 @@ def show_last_picture(request: Request, animal_type: str = Query(default="cat"))
             "error.html", {"request": request, "message": "Invalid animal type"}
         )
 
-    session = SessionLocal()
+    session = db.SessionLocal()
     picture = (
         session.query(Picture)
         .filter(Picture.animal_type == animal_type)
