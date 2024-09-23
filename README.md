@@ -13,8 +13,8 @@
 
 1. Clone the Repository
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+git clone https://github.com/hcevikdotpy/camunda-tech-challenge
+cd camunda-tech-challenge/
 ```
 
 2. Run Docker Compose
